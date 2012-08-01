@@ -1,0 +1,295 @@
+# =========================================================================
+# $Id: ChangeLog 158 2007-01-21 19:44:17Z trappist $
+# =========================================================================
+
+--0.6.1--
+15-01-2006: Pedro Algarvio <ufs@ufsoft.org>
+	IPKungFu:
+	Updated/Corrected ChangeLog and prepared for bugfix release.
+11-09-2006: Rocco Stanzione <grasshopper@linuxkungfu.org>
+	* FAQ:
+	Add instructions to stop firewall logs to the console.
+06-09-2006: Rocco Stanzione <grasshopper@linuxkungfu.org>
+	* ipkungfu.in
+	Fixed a bug where multiple LOCAL_NETs would throw iptables errors
+	* ipkungfu.8.in
+	Fixes files path
+
+
+--0.6.0--
+04-01-2006: Pedro Algarvio <ufs@ufsoft.org>
+	* ChangeLog:
+	Updated Changelog.
+04-01-2006: Rocco Stanzione <grasshopper@linuxkungfu.org>
+	* README, FAQ:
+	Small documentation updates.
+20-12-2005: Rocco Stanzione <grasshopper@linuxkungfu.org>
+	* ipkungfu.in:
+	Fix some typos and a bug reported by dooglus.
+18-12-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* ipkungfu.in:
+	Fixed a disrespect to the INIT seeting that was causing some output when
+	there should be none.
+	Fixed output that also shouldn't exist introduced by the need to pass only
+	'-c' to the md5sum binary, closes bug #34.
+	Added a check for MARK packets support, closes bug #33.
+	The rule to test TOS support is now done on the SYSTEST chain also.
+	Fixed bug #35, ipkungfu will now stop if it's own md5 sig check fails.
+	Fixed the creation of the services.conf file from the user defined
+	ALLOWED_*_IN.
+	* Makefile.am:
+	Upon 'make install' we now remove /etc/ipkungfu/cache.
+13-12-2005: Rocco Stanzione <grasshopper@linuxkungfu.org>
+	* ipkungfu.in:
+	Fixed a few typos and reword a warning.
+08-12-2005: Rocco Stanzione <grasshopper@linuxkungfu.org>
+	* ipkungfu.in, advanced.conf:
+	Optionally disallow packets from the internal network with state
+	'INVALID'. On by default and applied only to tcp and udp.
+08-12-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* ipkungfu.in:
+	IPKungFu no longer sed's himself, instead, it creates some "behaviour
+	files" on the cache dir.
+	* configure.ac:
+	The md5sum binary is now a necessary dependency.
+29-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* ipkungfu.in:
+	On Linux knoppix 3.6, when checking md5 signatures, the md5sum binary
+	didn't accepted --check nor ---status. The solution was to use -c, the
+	short arg for checking, redirect any output to /dev/null and check the
+	exit code of the command to see if the signature check was good.
+28-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* configure.ac:
+	Fixed a problem when using 'make install-config'. If a user just did
+	'./configure && make && make install && make install-config', the config
+	files would end up on '/usr/local/etc/ipkungfu/'.
+	Removed some un-necessary text.
+	* ipkungfu.in:
+	Removed some redirects to 'logError()' which were making ipkungfu report
+	wrong '$?' exit codes.
+	Removed some un-necessary bash childs.
+	* files/conf/services.conf:
+	Added an msn messenger example that probably will need to be removed.
+27-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* ipkungfu.in:
+	Removed some un-necessary bash childs.
+	Improved some of the code's readability.
+	Added yet another 'until loop' wich only runs in case the rule target is
+	bigger than 6 chars wide to match the 'Target' header label.
+27-11-2005: Rocco Stanzione <grasshopper@linuxkungfu.org>
+	* ipkungfu.in:
+	Removed some possible infinitive loops.
+	Fixed some typos.
+25-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* ipkungfu.in:
+	IPKungFu now check's it's own md5sum integrity IF it's not the first time
+	it's running.
+	Improved --d|--disable argument of ipkungfu, it should respect the value
+	of INIT, else, the init scripts made by distros will show output when no
+	output should exist.
+	Improved the caching behaviour of IPKungFu.
+23-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* ipkungfu.in:
+	Output is now all ligned up correctly no mater how long or how short the
+	services name and port are.
+	IPKungFu now accepts iptables log messages with blank spaces, for this,
+	fwLog was replaced by setupLogging() which sets up our $LOG_CMD to use on
+	the iptables calls.
+22-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* ipkungfu.in:
+	We now don't use any color-codes to colorize the output	of ipkungfu
+	anymore, we use variables to do that for us. So if we want to change a
+	color, we only need to do it in one place.
+	handleAcceptTcpServices and handleAcceptUdpServices don't exist anymore,
+	because they're now treated with handleServices, which was previoulsly
+	known as handleOtherServices.
+21-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* ipkungfu.in:
+	IPKungFu now has the ability to create the services.conf file for the
+	user. 
+10-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* services.conf:
+	If a service name is a blank string, ipkungfu will check for it in
+	'/etc/services'. User might want ipkungfu to grab the service name from
+	'/etc/services' instead of 'services.conf'.
+09-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* loadKernelModules():
+	The default kernel modules will be checked for presence in the filesystem,
+	if found load them, if not found assume they're built into the kernel.
+	This will prevent the output of errors while loading ip_nat_irc,
+	ip_conntrack_ftp, ip_nat_ftp, ip_conntrack_irc, if these are built into
+	the kernel.
+	Fixed error logging support while trying to load kernel modules, was badly
+	redirecting STDERR to our logError() function.
+	* logError():
+	In case logError() function get's called without any message, it won't log
+	anything.
+08-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* --failsafe argument:
+	Now, passing '--failsafe' will override the users FAILSAFE setting in
+	'ipkungfu.conf'.
+06-11-2005: Rocco Stanzione <grasshopper@linuxkungfu.org>
+	* TOS Support Check:
+	Added a test for TOS support.
+02-11-2005: Pedro Algarvio <ufs@ufsoft.org>
+	* Fixed REGEX Expresion:
+	Fixed REGEX Expresion when passing '-l' or '--list' to ipkungfu
+	* configurable list of conntrack modules:
+	Added support to load a configurable list of conntrack modules.
+	* Run-Time Error Logging:
+	Added run-tim error logging support.
+26-10-2005 Pedro Algarvio <ufs@ufsoft.org>
+	* Iptables Rules Caching Support Added:
+	Added rules caching support to use with iptables-save and
+	iptables-restore, which saves a lot of time loading ipkungfu.
+23-10-2005 Pedro Algarvio <ufs@ufsoft.org> and Chandler Carruth <chandlerc@retina-software.com>:
+	* Autonconf support:
+	IPKungFu now support's the GNU Standard.
+09-06-2005:Improved checks for valid network addresses thanks to Andy Dustman
+09-06-2005:Wow, long time.  Make dropping of fragments optional and off by default
+06-18-2004:Lots of bugfixes and improvements courtesy of weeve@gentoo.org
+03-11-2004:Added a FAQ entry for FXP
+01-29-2004:Added a test for iptables in the executable (thanks Hawkwind)
+11-29-2003:Fixed a bug in the loading of the ftp nat module
+11-21-2003:Use of multiport match is now optional
+10-19-2003:Changed shebang line to #!/bin/bash
+10-12-2003:Added a test for tcp syncookies support
+--0.5.2
+09-30-2003:Fixed a cosmetic bug in ALLOWED_UDP_IN
+--0.5.1--
+09-30-2003:Added FAILSAFE config option
+09-28-2003:Added test for TTL support
+09-27-2003:Smarter autoconfiguration of DISALLOW_PRIVATE
+09-25-2003:Added pre- and post- scripts
+09-23-2003:Added PATH variable to fix distros like Redhat
+09-22-2003:Reduced output verbosity
+09-22-2003:Removed string matching rules for now
+09-22-2003:Don't log icmp in catch-all
+09-20-2003:Added --failsafe option to prevent loss of remote access if ipkungfu fails
+09-18-2003:Removed rule saving since we're not doing anything with it yet
+09-16-2003:ipkungfu -c no longer takes forever to return results
+09-16-2003:Replaced MASQ_LOCAL_NET and IP_FORWARD with GATEWAY in config. MASQ_LOCAL_NET and IP_FORWARD are still used internally
+09-12-2003:Fixed vhost output to fit in a nonfb terminal window
+09-12-2003:Fixed vhost output to deal with optionally blank ports
+09-12-2003:Fixed ulog support detection
+09-12-2003:Fixed a small bug in the port redirection code
+09-12-2003:New init script by Bruno Torres (thanks!) should work for most distros
+09-12-2003:Either Port or Protocol (but not both) can be omitted in vhosts.conf
+09-12-2003:Got rid of PARALLEL_HTTP feature
+09-02-2003:Added support for port ranges in ALLOWED_*_IN
+09-01-2003:Removed FORWARD rules for ALLOWED_*_IN
+09-01-2003:Updated icq example in vhosts.conf
+08-28-2003:Updated comments and examples in redirect.conf
+08-27-2003:Removed PING_FLOOD code - there doesn't seem to be a way to do this the way I want
+08-26-2003:Fixed numerous ping issues
+08-22-2003:All config options in ipkungfu.conf are now guessed, detected, or have reasonable defaults and are commented out by default
+08-22-2003:Stopping ipkungfu now enables ping
+08-22-2003:Added output for port redirection
+08-22-2003:No longer aborts for lack of LOG target support if LOG_FACILITY=ulog
+08-22-2003:Added RFC compliant list of IP ranges to reject from EXT_NET if DISALLOW_PRIVATE=1
+08-22-2003:Added optional wait time for init to work around mysterious kernel panics
+08-22-2003:Better way to modprobe irc and ftp conntrack modules
+08-22-2003:Added --show-vars command line option
+
+--0.5.0--
+05-26-2003:Path to executable is a variable in the init script to make life easier for packagers
+05-22-2003:Added 'RETURN' as a valid target for SUSPECT, KNOWN_BAD, and PORT_SCAN
+05-13-2003:Added option to set TTL on outbound traffic
+04-29-2003:Updated installer
+04-29-2003:Fixed detection of some nmap portscans, courtesy of SiegeX
+04-29-2003:Numerous small bugfixes, courtesy of SiegeX
+04-29-2003:Added syncookie support
+04-18-2003:Applied deny_hosts.conf to the FORWARD chain
+04-15-2003:Added --flush option
+04-14-2003:Added config option for modprobe path
+04-11-2003:Added unclean match support
+04-11-2003:Made it possible to have a server on a public IP inside the firewall and have another server on the same port on a private IP inside the firewall
+04-11-2003:Added machanism to get external IP address
+04-09-2003:Added connection tracking to the FORWARD chain
+04-05-2003:Added forward.conf to manage the FORWARD chain
+04-05-2003:Added support for networks with public IP addresses inside the firewall
+04-05-2003:Added support for filtering outbound traffic from inside the firewall
+03-25-2003:Rearranged rules for more effective port scan detection
+01-21-2003:Fixed a bad sample rule in custom.conf
+01-21-2003:Added additional configuration sanity checks
+01-28-2003:Fixed the DONT_LOG options in log.conf
+
+--0.4.0--
+01-25-2003:Better (I hope) default settings in conf files
+01-25-2003:Fixed installer to install the conf files (oops)
+01-25-2003:Added "direction" support in redirect.conf
+01-25-2003:Added some new options to log.conf
+01-25-2003:Added support for the ULOG target in log.conf
+01-24-2003:Added support for multiple internal devices
+01-24-2003:Added support for multiple internal subnets
+
+--0.3.2--
+01-20-2003:Rewrote installer, which now just copies files and makes no attempt at configuration
+01-20-2003:Several bugfixes, comments added
+01-19-2003:Port forwarding no longer interferes with outgoing packets
+01-12-2003:Fixed some permissions problems
+01-12-2003:Fixed installer so custom.conf gets installed
+01-12-2003:Fixed a bug that prevents users from opening one port per protocol <lazycode>
+
+--0.3.1--
+01-05-2003:Added option to negatively specify hosts in vhosts.conf with a !
+
+--0.3.0--
+01-04-2003:Added support for port ranges in various config files
+01-03-2003:Put syn-flood chain back in
+12-14-2002:Eliminated syn-flood chain
+12-14-2002:Used multiport match to open ports, to cut down on rules
+12-14-2002:Removed rules that use external IP address
+12-13-2002:Completely rewrote installer to be non-interactive
+12-07-2002:Maybe took some hassle out of dcc, needs testing
+12-06-2002:Added --quiet option
+12-06-2002:Added init script
+12-06-2002:Added uninstall script
+12-06-2002:Fixed a bug with deny_hosts.conf
+
+--0.2.1--
+11-26-2002:Added --help (jahhan)
+11-26-2002:Fixed multiple small bugs (jahhan)
+11-25-2002:Updated installer
+11-25-2002:Added preliminary support for dhcp servers
+11-25-2002:Added --log-tcp-options to some relevant logs
+11-25-2002:Put much of the code into functions
+11-24-2002:Added "IPKF" string to all logs (more greppable)
+11-24-2002:Added --panic (no one-letter easy-screwup version)
+11-24-2002:Added --version, --list, --check, --disable and 1-letter versions thereof
+11-20-2002:Fixed denyhosts bug (thanks martin!)
+11-19-2002:Added code to autoload ip_conntrack_irc and ip_nat_irc 
+11-15-2002:Added option to REJECT identd instead of DROP
+11-15-2002:Eliminated some redundant rules
+
+--0.2.0--
+11-13-2002:trelane found an installer bug for standalone boxen - fixed
+11-12-2002:Removed catch-all rule for the FORWARD chain
+11-12-2002:Changed default policy for the FORWARD chain to ACCEPT
+11-12-2002:Added preliminary DMZ support
+11-12-2002:Added the ability to specify hosts to allow access to vhosts
+11-12-2002:Added localhost redirect support
+11-12-2002:Added accept_hosts.conf and deny_hosts.conf
+11-12-2002:Changed rule-saving to support non-chkconfig-compatible installs
+11-12-2002:Changed default policies for OUTPUT and FORWARD to ACCEPT
+11-12-2002:Added ToS mangling code
+11-12-2002:Improved virtual host redirection support
+11-12-2002:Added support for custom rules
+11-12-2002:Log verbosity is now configurable
+11-12-2002:Additional configuration sanity checks... more still needed
+11-12-2002:Added some very nice features borrowed from Arno's iptables-script
+11-12-2002:Added interactive installer
+11-12-2002:Split into multiple files, executable and config
+
+--0.1.1--
+10-20-2002:Added support for multiple virtual hosts (thanks Wolf!)        
+10-19-2002:Added rule saving for non-chkconfig-friendly distros           
+10-17-2002:Fixed a rather unfriendly error message                        
+10-10-2002:Fixed dcc bug                                                  
+10-10-2002:Added --disable command line option                            
+10-10-2002:Removed some redundant rules                                   
+10-10-2002:OK so we do need the external IP                               
+09-19-2002:Added Slapper code                                             
+09-19-2002:Added changelog :)                                             
+09-19-2002:Removed the need to know the IP of the external interface      
+

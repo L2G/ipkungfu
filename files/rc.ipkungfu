@@ -1,0 +1,99 @@
+#!/bin/sh
+
+# =========================================================================
+# $Id: rc.ipkungfu 42 2005-10-30 23:48:11Z s0undt3ch $
+# =========================================================================
+#             $URL: http://ipkungfu.ufsoft.org/svn/tags/ipkungfu-0.6.1/files/rc.ipkungfu $
+# $LastChangedDate: 2005-10-30 17:48:11 -0600 (Sun, 30 Oct 2005) $
+#             $Rev: 42 $
+#   $LastChangedBy: s0undt3ch $
+# =========================================================================
+
+
+# ipkungfu startup script
+#
+# chkconfig: 2345 98 92
+#
+# description: Starts the ipkungfu firewall
+#
+# by Rocco Stanzione, based on the iptables script:
+# Script Author:	Rocco Stanzione <grasshopper@linuxkungfu.org>
+#
+
+# Source 'em up
+#. /etc/init.d/functions
+
+IPKF_CONFIG=/etc/ipkungfu/ipkungfu.conf
+IPKF_EXE=/usr/local/sbin/ipkungfu
+
+if [ ! -x $IPKF_EXE ]; then
+	exit 0
+fi
+
+KERNELMAJ=`uname -r | sed                   -e 's,\..*,,'`
+KERNELMIN=`uname -r | sed -e 's,[^\.]*\.,,' -e 's,\..*,,'`
+
+if [ "$KERNELMAJ" -lt 2 ] ; then
+	exit 0
+fi
+if [ "$KERNELMAJ" -eq 2 -a "$KERNELMIN" -lt 3 ] ; then
+	exit 0
+fi
+
+if  /sbin/lsmod 2>/dev/null |grep -q ipchains ; then
+	echo "ipchains module loaded.  Aborting.  Try rmmod ipchains and try again."
+	exit 0
+fi
+
+status="$IPKF_EXE --init"
+
+start() {
+	# don't do squat if we don't have the config file
+	if [ -f $IPKF_CONFIG ]; then
+	    printf "Starting ipkungfu: "
+	    #status="$IPKF_EXE --init"
+	    if $status; then
+	       echo -e "                                             [\\033[1;32m  OK\\033[0;39m  ]"
+	    else
+	       echo -e "                                                            [\\033[1;31m  FAILED\\033[0;39m  ]"
+	    fi
+	else
+	   echo -e "                                                                [\\033[1;31m  FAILED\\033[0;39m  ]"
+	fi
+}
+
+stop() {
+	$IPKF_EXE --disable
+	#rm -f /var/lock/subsys/ipkungfu
+}
+
+case "$1" in
+  start)
+	start
+	;;
+
+  stop)
+	stop
+	;;
+
+  restart|reload)
+	# "restart" is really just "start" as this isn't a daemon,
+	#  and "start" clears any pre-defined rules anyway.
+	#  This is really only here to make those who expect it happy
+	start
+	;;
+
+  status)
+	$IPKF_EXE --check
+	;;
+
+  panic)
+	$IPKF_EXE --panic
+        ;;
+  *)
+	printf "Usage: %s {start|stop|restart|status|panic}\n" "$0"
+	exit 1
+esac
+
+exit 0
+

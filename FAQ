@@ -1,0 +1,161 @@
+===============================================================================
+$Id: FAQ 151 2006-09-11 21:50:40Z trappist $
+===============================================================================
+
+
+TROUBLESHOOTING IPKUNGFU
+
+ First, did you read the README?
+ Did you check your configuration files in /etc/ipkungfu/ ?
+ Did you re-run ipkungfu after changing a configuration file?
+ 
+ Some common problems people have had are covered here:
+
+ "When I run ipkungfu I get 'ipkungfu: command not found'" - first,
+ make sure you have installed ipkungfu by running the installer (just
+ type ./install in the unpacked ipkungfu directory.  If you have done
+ this, ipkungfu is probably not in your PATH. ipkungfu is installed to 
+ /usr/local/sbin.  You can type /usr/local/sbin/ipkungfu instead, or 
+ add /usr/local/sbin to your $PATH environment variable:
+ 	export PATH=$PATH:/usr/local/sbin
+
+ "I get an ERROR: Root check FAILED" - This one is quite simple, you must
+ be root to install, configure and run ipkungfu. Log in as root or
+ su to root.
+
+ "I ran the installer, but the firewall did not come up" - Installing
+ ipkungfu and running ipkungfu are two different things. You should run the
+ ipkungfu script located in the /usr/local/sbin directory after editing
+ any configuration files you want to customize.
+
+ "I changed a configuration file, but nothing changed" - The likely answer is
+ that you did not re-run ipkungfu. ipkungfu builds the rules for the firewall 
+ based on the configuration files. Once rules are created, the contents of 
+ the configuration files are irrelevant unless you run ipkungfu  again.
+
+ "How can I get ipkungfu to start at boot?" - Most Linux distributions make
+ it possible to run init scripts.  If so, you have a script called ipkungfu 
+ in /etc/init.d or /etc/rc.d/init.d that you can add to your startup 
+ configuration.  If your distribution is chkconfig-compatible like Redhat or 
+ Mandrake, the ipkungfu install script does this for you.  If this doesn't 
+ work for you, add the following line to an existing init script, such as 
+ rc.local or ifup-post:
+ 
+ /usr/local/sbin/ipkungfu --init
+
+ "How can I check to see if my firewall is running?" - As root, type:
+
+ 	ipkungfu -c 
+	or
+	ipkungfu --check
+
+ "I'm trying to run a game server, but people can't connect" - First make sure
+ you have allowed connections to the correct port(s). Check the configuration
+ in /etc/ipkungfu/ipkungfu.conf and re run ipkungfu if changes are made. If it
+ is correct, or still does not work, edit /etc/ipkungfu/advanced.conf and set
+ LOOSE_UDP_PATCH to 1.
+
+ "I can't play Microsoft games through my firewall" - Don't worry, it's not
+ ipkungfu's fault!  Many newer Microsoft applications, including games, use
+ Universal Plug N Play technology, and Linux isn't very good at doing the
+ right things with that traffic.  But all is not lost!  There is a product
+ called linux-igd, a UPnP gateway for linux, available which makes these 
+ things possible.  Check out http://sourceforge.net/projects/linux-igd for
+ details.  I have reports that this also makes it possible to transfer files
+ using MSN Messenger using this product.  Alternatively, it may be possible
+ to play the games by forwarding the appropriate ports to the client
+ machine by editing /etc/ipkungfu/vhosts.conf.  Several examples are
+ provided.
+
+ "I can't send files via dcc in IRC!" - Some file transfer mechanisms, like
+ dcc, use random ports.  You must have ip_conntrack and ip_conntrack_irc
+ either inserted into the running kernel as modules, or compiled into the
+ kernel itself.  The purpose of these modules is to track the dcc connection
+ and associate it with your existing irc connection so that it can be allowed
+ through your firewall without explicitly allowing it or opening unnecessary
+ holes in your firewall. 
+ 
+ "When people connect to my ftp server and try to get a list of files, it just
+ kinda sits there" - This is essentially the same issue as the dcc situation
+ described above.  You need the ftp conntrack helper module 
+ (ip_conntrack_ftp).  Refer to the dcc question above for details. As with 
+ dcc, ftp by default uses random ports, and the kernel's packet filtering
+ code needs this helper module to track the connection across these ports
+ to allow established ftp connections through them.  The relevant modules
+ are ip_conntrack_ftp and ip_nat_ftp.
+
+ "I run an fxp server, and people can connect but they can't transfer files"
+ - the ftp conntrack and nat modules (described above) contain fxp
+ functionality that's disabled by default - do:
+
+       modprobe ip_conntrack_ftp fxp=1
+
+ Substitute ip_nat_ftp as appropriate if the ipkungfu box is not the same
+ machine as the fxp server.
+
+ "I can't connect to my Windows VPN server, or the connection gets dropped."
+ - This, too, is likely a connection tracking issue.  The last time I
+ checked, the pptp conntrack module wasn't in the stock kernel, and this
+ may be what you need.  If you don't have it, get the latest patch-o-
+ matic from http://netfilter.org.  I don't know why, but the module
+ doesn't work for me unless I compile it as a module, rather than into the
+ kernel ("m" as opposed to "y").  Don't forget to rebuild iptables after
+ patching.  Then, modprobe ip_conntrack_pptp (and ip_nat_pptp if
+ applicable).
+
+ "Will ipkungfu work with ipchains?" - Let me put it this way:  No. ipkungfu 
+ only works on Linux kernels 2.4 and higher that have iptables support.
+
+ "How can I temporarily turn off the firewall or stop all access?" - Although
+ disabling the firewall when you are connected to an external network such as
+ the Internet is not recommended, if it is necessary, then you have 2 options.
+ Disable the firewall so all access is allowed (not recommended) or shut off
+ all access, internal and external (panic mode)
+
+ 	For panic mode:
+	 ipkungfu --panic
+
+	To just disable:
+	 ipkungfu -d
+	or
+	 ipkungfu --disable
+
+  To turn the firewall back on, simply rerun the ipkungfu script:
+
+  	ipkungfu
+
+ There is no need to turn off the firewall to make a change to a
+ configuration file, but the script must be rerun for changes to take effect.
+
+ "Where is the firewall log located?" - Many systems use /var/log/syslog to
+ log kernel messages. Since packets are filtered at the kernel level, this is
+ where they are most likely located, along with other kernel messages.  All
+ ipkungfu log entries contain the string "IPKF", so you can, for example:
+
+ grep IPKF /var/log/syslog
+
+ to see recent firewall logs, unless you have selected ulog as your logging
+ facility in log.conf, in which case the location of your log will depend on
+ your configuration of the ulogd utility.
+
+ "I'm working remotely; what are the odds that ipkungfu will lock me out?" -
+ Well that depends.  If you fail to allow access to sshd, or telnet, or
+ whatever you're using, or you block the IP address you're connecting from,
+ you're out of luck.  But as of 0.5.1 there is a new command line option,
+ --failsafe, that will set default policies on all builtin chains in the
+ filter table to ACCEPT, in the event that ipkungfu fails.  This can also
+ be accomplished by setting FAILSAFE=1 in ipkungfu.conf.  As an additional
+ measure, you may add a custom rule to /etc/ipkungfu/post.conf to, say,
+ allow tcp port 22 from the IP address you're working from no matter what
+ happens.
+
+ "I've just installed a new kernel, and when I run ipkungfu I get all kinds
+ of errors" - In many (most) cases, when you install a new kernel, you must
+ also recompile iptables against the source of the new kernel.  Obtain the
+ iptables source from netfilter.org or from your distribution vendor and
+ recompile.
+
+ "I'm getting firewall on my console, and it's really screwing me up.  How
+ can I stop this?" - as root, try this:
+
+ sysctl kernel.printk="4 4 1 7"

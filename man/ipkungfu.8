@@ -1,0 +1,100 @@
+.TH ipkungfu 8 "January 2003"
+.SH NAME
+ipkungfu \- An iptables-based firewall for Linux
+.SH SYNOPSIS
+.B ipkungfu
+[
+.B \-c
+] [
+.B \-t
+] [
+.B \-d
+] [
+.B \-h
+] [
+.B \-v
+] [
+.BI \-\-quiet
+] [
+.BI \-\-panic
+] [
+.BI \-\-no\-caching
+
+.SH DESCRIPTION
+.B ipkungfu
+is an iptables-based Linux firewall. The primary design goals are security, ease of use, and performance, in that order. It takes advantage of advanced features of iptables, tcpwrappers, and the Linux kernel. It also simplifies the configuration of internet connection sharing, advanced routing, and other networking needs.
+
+.SH OPTIONS
+.TP 12
+
+.B \-c " (or " \-\-check)
+Check whether \fIipkungfu\fP is loaded, and report any command line options it may have been loaded with.
+.TP
+
+.B \-t " (or " \-\-test)
+Runs a configuration test, and displays the results.  Note that this does not test or display all configuration options.  This gives you an opportunity to verify that major configuration options are correct before putting them into action.
+.TP
+
+.B \-d " (or " \-\-disable)
+Disables the firewall.  It is important to know exactly what this option does.  All traffic is allowed in and out, and in the case of a gateway, all NATed traffic is forwarded (the option retains your connection sharing options).  Custom rules are not implemented, and \fIdeny_hosts.conf\fP is ignored.
+.TP
+
+.B \-f " (or " \-\-flush)
+Disables the firewall COMPLETELY.  All rules are flushed, all chains are removed.  Any port forwarding or internet connection sharing will cease to work.
+.TP
+
+.B \-h " (or " \-\-help)
+Displays brief usage information and exits.
+.TP
+
+.B \-v " (or " \-\-version)
+Displays version information and exits.
+.TP
+
+.B \-\-quiet
+Runs ipkungfu with no standard output
+.TP
+
+.B \-\-panic               
+Drops ALL traffic in all directions on all network interfaces.  You should probably never use this option.  The \fI--panic\fP option is available for the highly unusual situation where you know that an attack is underway but you know of no other way to stop it.
+.TP
+
+.B \-\-failsafe
+If ipkungfu fails, \fI--failsafe\fP will cause all firewall policies to revert to ACCEPT.  This is useful when working with ipkungfu remotely, to prevent loss of remote access due to firewall failure.
+.TP
+
+.B \-\-no\-caching
+Disables rules caching feature.
+
+.SH FILES
+.PD 0
+.B /etc/ipkungfu/ipkungfu.conf
+.br
+.B /etc/ipkungfu/advanced.conf
+.br
+.B /etc/ipkungfu/accept_hosts.conf
+.br
+.B /etc/ipkungfu/deny_hosts.conf
+.br
+.B /etc/ipkungfu/custom.conf
+.br
+.B /etc/ipkungfu/log.conf
+.br
+.B /etc/ipkungfu/redirect.conf
+.br
+.B /etc/ipkungfu/services.conf
+.br
+.B /usr/local/sbin/ipkungfu
+.br
+.B /usr/local/share/doc/ipkungfu-0.6.1/AUTHORS
+.br
+.B /usr/local/share/doc/ipkungfu-0.6.1/README
+.br
+.B /usr/local/share/doc/ipkungfu-0.6.1/FAQ
+.br
+.B /usr/local/share/doc/ipkungfu-0.6.1/ChangeLog
+.br
+.B /usr/local/share/doc/ipkungfu-0.6.1/COPYING
+.PD
+.SH SEE ALSO
+.BR iptables (8).
